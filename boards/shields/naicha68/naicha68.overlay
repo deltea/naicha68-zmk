@@ -46,7 +46,7 @@
  *   SDA → XIAO P0.06 (SDA / pin D4)
  *   SCL → XIAO P0.07 (SCL / pin D5)
  */
-&arduino_i2c {
+&i2c1 {
     status = "okay";
     clock-frequency = <I2C_BITRATE_FAST>;   /* 400 kHz — reduce to
                                                 I2C_BITRATE_STANDARD (100 kHz)
