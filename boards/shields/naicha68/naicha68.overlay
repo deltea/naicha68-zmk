@@ -49,22 +49,42 @@
 
 &i2c0 {
     status = "okay";
+    pinctrl-0 = <&i2c0_default>;
+    pinctrl-1 = <&i2c0_sleep>;
+    pinctrl-names = "default", "sleep";
 
-    /* Expander 1: Handles Rows 0-4 and Columns 0-10 */
+    /* Your expander child nodes remain inside here */
     pca9555_1: pca9555@20 {
         compatible = "nxp,pca9555";
-        reg = <0x20>; /* Hardware pins A2, A1, A0 tied to GND */
+        reg = <0x20>;
         gpio-controller;
         #gpio-cells = <2>;
         ngpios = <16>;
     };
 
-    /* Expander 2: Handles Columns 11-16 */
     pca9555_2: pca9555@21 {
         compatible = "nxp,pca9555";
-        reg = <0x21>; /* Hardware pin A0 tied to VCC, A1/A2 to GND */
+        reg = <0x21>;
         gpio-controller;
         #gpio-cells = <2>;
         ngpios = <16>;
+    };
+};
+
+&pinctrl {
+    i2c0_default: i2c0_default {
+        group1 {
+            /* Map TWIM signals to P0.04 (SDA) and P0.05 (SCL) */
+            psels = <NRF_PSEL(TWIM_SDA, 0, 4)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 5)>;
+        };
+    };
+
+    i2c0_sleep: i2c0_sleep {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 4)>,
+                    <NRF_PSEL(TWIM_SCL, 0, 5)>;
+            low-power-enable; /* Saves battery when I2C is inactive */
+        };
     };
 };

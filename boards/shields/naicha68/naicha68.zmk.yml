@@ -3,8 +3,8 @@ id: naicha68
 name: naicha68
 type: shield
 url: https://github.com/deltea/naicha68-zmk
-requires: [xiao_ble//zmk]
-# exposes: [i2c_oled]
+requires: [xiao_ble]
+exposes: [i2c_oled]
 features:
   - keys
   - display
