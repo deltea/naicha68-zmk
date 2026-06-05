@@ -1,94 +1,170 @@
-#include <dt-bindings/zmk/matrix_transform.h>
+/*
+ * ┌─────────────────────────────────────────────────────────────────────────┐
+ * │  my_keyboard.overlay                                                    │
+ * │  Device-tree overlay for the my_keyboard ZMK shield                    │
+ * │  MCU : Seeed Studio XIAO nRF52840  (board: seeeduino_xiao_ble)         │
+ * │  IOs : 2× PCA9555D via I²C — polling mode (INT pins NOT connected)     │
+ * └─────────────────────────────────────────────────────────────────────────┘
+ *
+ * ╔═══════════════════════════════════════════════════════════════════════════╗
+ * ║  REQUIRED CUSTOMIZATIONS — search the file for [CUSTOMIZE #N]           ║
+ * ║  #1  I²C address of each expander (A2/A1/A0 strapping)                 ║
+ * ║  #2  GPIO number → PCB net assignment for rows and columns              ║
+ * ║  #3  Total row count and column count                                   ║
+ * ║  #4  Diode direction: col2row or row2col                                ║
+ * ╚═══════════════════════════════════════════════════════════════════════════╝
+ *
+ * ── PCA9555D Address Reference (fixed base 0b0100_A2A1A0) ──────────────────
+ *  A2  A1  A0  │ Address
+ *  GND GND GND │  0x20   ← ioex0 default in this file
+ *  GND GND VCC │  0x21   ← ioex1 default in this file
+ *  GND VCC GND │  0x22
+ *  GND VCC VCC │  0x23
+ *  VCC GND GND │  0x24
+ *  VCC GND VCC │  0x25
+ *  VCC VCC GND │  0x26
+ *  VCC VCC VCC │  0x27
+ *
+ * ── PCA9555 GPIO Numbering Used Below ──────────────────────────────────────
+ *   0–7  → Port 0 pins  P00–P07
+ *   8–15 → Port 1 pins  P10–P17
+ *
+ * ── Pull Resistor Warning ───────────────────────────────────────────────────
+ *  The PCA9555D has NO internal pull-up or pull-down resistors.
+ *  GPIO_PULL_DOWN is listed in the row-gpios flags below to correctly
+ *  express the intended electrical behaviour, but the driver cannot
+ *  configure it in hardware.
+ *  ► You MUST have external pull-down resistors (typically 10 kΩ) on every
+ *    row sense line (for col2row) or every column sense line (for row2col)
+ *    on your PCB.  Without them the input pins will float and produce ghost
+ *    keypresses.
+ */
 
+/* ── I²C bus ─────────────────────────────────────────────────────────────── */
+/*
+ * [CUSTOMIZE] If the build rejects &arduino_i2c, replace it with &i2c1.
+ *   SDA → XIAO P0.06 (SDA / pin D4)
+ *   SCL → XIAO P0.07 (SCL / pin D5)
+ */
+&arduino_i2c {
+    status = "okay";
+    clock-frequency = <I2C_BITRATE_FAST>;   /* 400 kHz — reduce to
+                                                I2C_BITRATE_STANDARD (100 kHz)
+                                                if you see I²C errors */
+
+    /* ── IO Expander 0: ROWS ─────────────────────────────────────────────── */
+    /*
+     * [CUSTOMIZE #1] Set the address that matches your A2/A1/A0 strapping.
+     *   Update BOTH the @XX label and reg = <0xXX> to the same value.
+     *
+     * [CUSTOMIZE #2] See row-gpios below for pin-to-row assignment.
+     *
+     * No interrupt-gpios property → driver operates without INT signalling.
+     * ZMK's KSCAN polling timer takes over the scan duty cycle.
+     */
+    ioex0: pca9555@20 {
+        compatible = "nxp,pca9555";
+        reg = <0x20>;           /* [CUSTOMIZE #1] */
+        gpio-controller;
+        #gpio-cells = <2>;
+        /* interrupt-gpios intentionally omitted — INT pin not routed */
+    };
+
+    /* ── IO Expander 1: COLUMNS ──────────────────────────────────────────── */
+    /*
+     * [CUSTOMIZE #1] Set address to match your A2/A1/A0 strapping.
+     */
+    ioex1: pca9555@21 {
+        compatible = "nxp,pca9555";
+        reg = <0x21>;           /* [CUSTOMIZE #1] */
+        gpio-controller;
+        #gpio-cells = <2>;
+        /* interrupt-gpios intentionally omitted — INT pin not routed */
+    };
+};
+
+/* ── Keyboard matrix ──────────────────────────────────────────────────────── */
 / {
     chosen {
         zmk,kscan = &kscan0;
     };
 
-    kscan0: kscan_0 {
+    kscan0: kscan0 {
         compatible = "zmk,kscan-gpio-matrix";
-        wakeup-source;
+        label = "KSCAN";
+
+        /*
+         * [CUSTOMIZE #4]
+         * col2row → diodes point Column → Row:
+         *           columns are driven HIGH; rows are sensed.
+         * row2col → diodes point Row → Column:
+         *           rows are driven HIGH; columns are sensed.
+         * Flip this if every key registers when it shouldn't (inverted logic).
+         */
         diode-direction = "col2row";
 
         /*
-         * ROWS (0 to 4) mapped to Expander 1.
-         * Using the last 5 pins of a 16-pin layout (pins 11 to 15).
+         * Polling period.
+         * Required because the PCA9555 INT lines are not connected —
+         * ZMK cannot receive an interrupt when a key changes state, so it
+         * must periodically read the matrix instead.
+         *
+         * 10 ms = 100 scans per second, well below debounce threshold and
+         * fast enough to feel instantaneous to a typist.
+         * You can lower this to 5 ms if you need faster response.
          */
-        row-gpios
-            = <&pca9555_1  20 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 0 */
-            , <&pca9555_1  19 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 1 */
-            , <&pca9555_1  18 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 2 */
-            , <&pca9555_1  17 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 3 */
-            , <&pca9555_1  16 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 4 */
+        poll-period-ms = <10>;
+
+        /*
+         * ─── COLUMNS ──────────────────────────────────────────────────────
+         * Driven HIGH one at a time during the scan sweep.
+         * [CUSTOMIZE #2] Map each column index to the PCB net → expander pin.
+         * [CUSTOMIZE #3] Add or remove entries to match your column count.
+         *
+         *   Format: <&expander  gpio_number  GPIO_ACTIVE_HIGH>
+         *
+         * This template assumes 14 columns, all on Expander 1.
+         * Adjust expander reference (&ioex0 / &ioex1) and gpio_number to
+         * reflect your actual PCB routing.
+         */
+        col-gpios
+            = <&ioex1  0 GPIO_ACTIVE_HIGH>  /* Col  0 → EXP1 P00 */
+            , <&ioex1  1 GPIO_ACTIVE_HIGH>  /* Col  1 → EXP1 P01 */
+            , <&ioex1  2 GPIO_ACTIVE_HIGH>  /* Col  2 → EXP1 P02 */
+            , <&ioex1  3 GPIO_ACTIVE_HIGH>  /* Col  3 → EXP1 P03 */
+            , <&ioex1  4 GPIO_ACTIVE_HIGH>  /* Col  4 → EXP1 P04 */
+            , <&ioex1  5 GPIO_ACTIVE_HIGH>  /* Col  5 → EXP1 P05 */
+            , <&ioex1  6 GPIO_ACTIVE_HIGH>  /* Col  6 → EXP1 P06 */
+            , <&ioex1  7 GPIO_ACTIVE_HIGH>  /* Col  7 → EXP1 P07 */
+            , <&ioex1  8 GPIO_ACTIVE_HIGH>  /* Col  8 → EXP1 P10 */
+            , <&ioex1  9 GPIO_ACTIVE_HIGH>  /* Col  9 → EXP1 P11 */
+            , <&ioex1 10 GPIO_ACTIVE_HIGH>  /* Col 10 → EXP1 P12 */
+            , <&ioex1 11 GPIO_ACTIVE_HIGH>  /* Col 11 → EXP1 P13 */
+            , <&ioex1 12 GPIO_ACTIVE_HIGH>  /* Col 12 → EXP1 P14 */
+            , <&ioex1 13 GPIO_ACTIVE_HIGH>  /* Col 13 → EXP1 P15 */
             ;
 
         /*
-         * COLUMNS (0 to 16) mapped across both expanders.
-         * Columns 0-10: Expander 1 (pins 10 down to 0).
-         * Columns 11-16: Expander 2 (pins 5 down to 0).
+         * ─── ROWS ─────────────────────────────────────────────────────────
+         * Read as inputs after each column is driven.
+         * [CUSTOMIZE #2] Map each row index to the PCB net → expander pin.
+         * [CUSTOMIZE #3] Add or remove entries to match your row count.
+         *
+         *   Format: <&expander  gpio_number  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
+         *
+         * ⚠  PCA9555D PULL RESISTOR WARNING (see top of file):
+         *    GPIO_PULL_DOWN is expressed here but is NOT configured in
+         *    hardware by the driver.  You need external 10 kΩ pull-down
+         *    resistors on each row sense line on your PCB.
+         *
+         * This template assumes 5 rows, all on Expander 0.
          */
-        col-gpios
-            = <&pca9555_1  15 GPIO_ACTIVE_HIGH> /* Col 0  */
-            , <&pca9555_1  14 GPIO_ACTIVE_HIGH> /* Col 1  */
-            , <&pca9555_1  13 GPIO_ACTIVE_HIGH> /* Col 2  */
-            , <&pca9555_1  12 GPIO_ACTIVE_HIGH> /* Col 3  */
-            , <&pca9555_1  11 GPIO_ACTIVE_HIGH> /* Col 4  */
-            , <&pca9555_1  10 GPIO_ACTIVE_HIGH> /* Col 5  */
-            , <&pca9555_1  9 GPIO_ACTIVE_HIGH> /* Col 6  */
-            , <&pca9555_1  8 GPIO_ACTIVE_HIGH> /* Col 7  */
-            , <&pca9555_1  7 GPIO_ACTIVE_HIGH> /* Col 8  */
-            , <&pca9555_1  6 GPIO_ACTIVE_HIGH> /* Col 9  */
-            , <&pca9555_1  5 GPIO_ACTIVE_HIGH> /* Col 10 */
-            , <&pca9555_2  20 GPIO_ACTIVE_HIGH> /* Col 11 */
-            , <&pca9555_2  19 GPIO_ACTIVE_HIGH> /* Col 12 */
-            , <&pca9555_2  18 GPIO_ACTIVE_HIGH> /* Col 13 */
-            , <&pca9555_2  17 GPIO_ACTIVE_HIGH> /* Col 14 */
-            , <&pca9555_2  16 GPIO_ACTIVE_HIGH> /* Col 15 */
-            , <&pca9555_2  15 GPIO_ACTIVE_HIGH> /* Col 16 */
+        row-gpios
+            = <&ioex0 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* Row 0 → EXP0 P00 */
+            , <&ioex0 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* Row 1 → EXP0 P01 */
+            , <&ioex0 2 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* Row 2 → EXP0 P02 */
+            , <&ioex0 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* Row 3 → EXP0 P03 */
+            , <&ioex0 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* Row 4 → EXP0 P04 */
             ;
-    };
-};
-
-&i2c0 {
-    status = "okay";
-    pinctrl-0 = <&i2c0_default>;
-    pinctrl-1 = <&i2c0_sleep>;
-    pinctrl-names = "default", "sleep";
-
-    /* Your expander child nodes remain inside here */
-    pca9555_1: pca9555@20 {
-        compatible = "nxp,pca9555";
-        reg = <0x20>;
-        gpio-controller;
-        #gpio-cells = <2>;
-        ngpios = <16>;
-        status = "okay";
-    };
-
-    pca9555_2: pca9555@21 {
-        compatible = "nxp,pca9555";
-        reg = <0x21>;
-        gpio-controller;
-        #gpio-cells = <2>;
-        ngpios = <16>;
-        status = "okay";
-    };
-};
-
-&pinctrl {
-    i2c0_default: i2c0_default {
-        group1 {
-            /* Map TWIM signals to P0.04 (SDA) and P0.05 (SCL) */
-            psels = <NRF_PSEL(TWIM_SDA, 0, 4)>,
-                    <NRF_PSEL(TWIM_SCL, 0, 5)>;
-        };
-    };
-
-    i2c0_sleep: i2c0_sleep {
-        group1 {
-            psels = <NRF_PSEL(TWIM_SDA, 0, 4)>,
-                    <NRF_PSEL(TWIM_SCL, 0, 5)>;
-            low-power-enable; /* Saves battery when I2C is inactive */
-        };
     };
 };
