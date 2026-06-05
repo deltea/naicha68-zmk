@@ -62,7 +62,7 @@
         gpio-controller;
         #gpio-cells = <2>;
         ngpios = <16>;
-        status = "okay"
+        status = "okay";
     };
 
     pca9555_2: pca9555@21 {
@@ -71,7 +71,7 @@
         gpio-controller;
         #gpio-cells = <2>;
         ngpios = <16>;
-        status = "okay"
+        status = "okay";
     };
 };
 
