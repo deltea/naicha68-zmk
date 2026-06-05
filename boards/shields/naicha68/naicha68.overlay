@@ -1,0 +1,70 @@
+/ {
+    chosen {
+        zmk,kscan = &kscan0;
+    };
+
+    kscan0: kscan_matrix {
+        compatible = "zmk,kscan-matrix";
+        wakeup-source;
+        diode-direction = "col2row";
+
+        /*
+         * ROWS (0 to 4) mapped to Expander 1.
+         * Using the last 5 pins of a 16-pin layout (pins 11 to 15).
+         */
+        row-gpios
+            = <&pca9555_11 7 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 0 */
+            , <&pca9555_11 6 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 1 */
+            , <&pca9555_11 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 2 */
+            , <&pca9555_11 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 3 */
+            , <&pca9555_11 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 4 */
+            ;
+
+        /*
+         * COLUMNS (0 to 16) mapped across both expanders.
+         * Columns 0-10: Expander 1 (pins 10 down to 0).
+         * Columns 11-16: Expander 2 (pins 5 down to 0).
+         */
+        col-gpios
+            = <&pca9555_11  2 GPIO_ACTIVE_HIGH> /* Col 0  */
+            , <&pca9555_11  1 GPIO_ACTIVE_HIGH> /* Col 1  */
+            , <&pca9555_11  0 GPIO_ACTIVE_HIGH> /* Col 2  */
+            , <&pca9555_10  7 GPIO_ACTIVE_HIGH> /* Col 3  */
+            , <&pca9555_10  6 GPIO_ACTIVE_HIGH> /* Col 4  */
+            , <&pca9555_10  5 GPIO_ACTIVE_HIGH> /* Col 5  */
+            , <&pca9555_10  4 GPIO_ACTIVE_HIGH> /* Col 6  */
+            , <&pca9555_10  3 GPIO_ACTIVE_HIGH> /* Col 7  */
+            , <&pca9555_10  2 GPIO_ACTIVE_HIGH> /* Col 8  */
+            , <&pca9555_10  1 GPIO_ACTIVE_HIGH> /* Col 9  */
+            , <&pca9555_10  0 GPIO_ACTIVE_HIGH> /* Col 10 */
+            , <&pca9555_21  7 GPIO_ACTIVE_HIGH> /* Col 11 */
+            , <&pca9555_21  6 GPIO_ACTIVE_HIGH> /* Col 12 */
+            , <&pca9555_21  5 GPIO_ACTIVE_HIGH> /* Col 13 */
+            , <&pca9555_21  4 GPIO_ACTIVE_HIGH> /* Col 14 */
+            , <&pca9555_21  3 GPIO_ACTIVE_HIGH> /* Col 15 */
+            , <&pca9555_21  2 GPIO_ACTIVE_HIGH> /* Col 16 */
+            ;
+    };
+};
+
+&i2c0 {
+    status = "okay";
+
+    /* Expander 1: Handles Rows 0-4 and Columns 0-10 */
+    pca9555_1: pca9555@20 {
+        compatible = "nxp,pca9555";
+        reg = <0x20>; /* Hardware pins A2, A1, A0 tied to GND */
+        gpio-controller;
+        #gpio-cells = <2>;
+        ngpios = <16>;
+    };
+
+    /* Expander 2: Handles Columns 11-16 */
+    pca9555_2: pca9555@21 {
+        compatible = "nxp,pca9555";
+        reg = <0x21>; /* Hardware pin A0 tied to VCC, A1/A2 to GND */
+        gpio-controller;
+        #gpio-cells = <2>;
+        ngpios = <16>;
+    };
+};
