@@ -1,6 +1,16 @@
 / {
     chosen {
-        zmk,kscan = &kscan0;
+        zmk,kscan = &kscan_composite;
+    };
+
+    kscan_composite: kscan_composite {
+        compatible = "zmk,kscan-composite";
+        rows = <5>;
+        cols = <17>;
+
+        matrix {
+            kscan = <&kscan0>;
+        };
     };
 
     kscan0: kscan_matrix {
