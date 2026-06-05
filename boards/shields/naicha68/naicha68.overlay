@@ -15,11 +15,11 @@
          * Using the last 5 pins of a 16-pin layout (pins 11 to 15).
          */
         row-gpios
-            = <&pca9555_1 20 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 0 */
-            , <&pca9555_1 19 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 1 */
-            , <&pca9555_1 18 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 2 */
-            , <&pca9555_1 17 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 3 */
-            , <&pca9555_1 16 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 4 */
+            = <&pca9555_1  20 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 0 */
+            , <&pca9555_1  19 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 1 */
+            , <&pca9555_1  18 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 2 */
+            , <&pca9555_1  17 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 3 */
+            , <&pca9555_1  16 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)> /* Row 4 */
             ;
 
         /*
