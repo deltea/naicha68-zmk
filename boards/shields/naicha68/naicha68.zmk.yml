@@ -1,10 +1,10 @@
 file_format: "1"
 id: naicha68
-name: naicha68
+name: Naicha68
 type: shield
 url: https://github.com/deltea/naicha68-zmk
-requires: [xiao_ble]
-exposes: [i2c_oled]
+requires: [seeeduino_xiao_ble]
+# exposes: [i2c_oled]
 features:
   - keys
-  - display
+  # - display

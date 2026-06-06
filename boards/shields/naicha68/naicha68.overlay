@@ -1,132 +1,32 @@
-/*
- * ┌─────────────────────────────────────────────────────────────────────────┐
- * │  my_keyboard.overlay                                                    │
- * │  Device-tree overlay for the my_keyboard ZMK shield                    │
- * │  MCU : Seeed Studio XIAO nRF52840  (board: seeeduino_xiao_ble)         │
- * │  IOs : 2× PCA9555D via I²C — polling mode (INT pins NOT connected)     │
- * └─────────────────────────────────────────────────────────────────────────┘
- *
- * ╔═══════════════════════════════════════════════════════════════════════════╗
- * ║  REQUIRED CUSTOMIZATIONS — search the file for [CUSTOMIZE #N]           ║
- * ║  #1  I²C address of each expander (A2/A1/A0 strapping)                 ║
- * ║  #2  GPIO number → PCB net assignment for rows and columns              ║
- * ║  #3  Total row count and column count                                   ║
- * ║  #4  Diode direction: col2row or row2col                                ║
- * ╚═══════════════════════════════════════════════════════════════════════════╝
- *
- * ── PCA9555D Address Reference (fixed base 0b0100_A2A1A0) ──────────────────
- *  A2  A1  A0  │ Address
- *  GND GND GND │  0x20   ← ioex0 default in this file
- *  GND GND VCC │  0x21   ← ioex1 default in this file
- *  GND VCC GND │  0x22
- *  GND VCC VCC │  0x23
- *  VCC GND GND │  0x24
- *  VCC GND VCC │  0x25
- *  VCC VCC GND │  0x26
- *  VCC VCC VCC │  0x27
- *
- * ── PCA9555 GPIO Numbering Used Below ──────────────────────────────────────
- *   0–7  → Port 0 pins  P00–P07
- *   8–15 → Port 1 pins  P10–P17
- *
- * ── Pull Resistor Warning ───────────────────────────────────────────────────
- *  The PCA9555D has NO internal pull-up or pull-down resistors.
- *  GPIO_PULL_DOWN is listed in the row-gpios flags below to correctly
- *  express the intended electrical behaviour, but the driver cannot
- *  configure it in hardware.
- *  ► You MUST have external pull-down resistors (typically 10 kΩ) on every
- *    row sense line (for col2row) or every column sense line (for row2col)
- *    on your PCB.  Without them the input pins will float and produce ghost
- *    keypresses.
- */
-
-/* ── I²C bus ─────────────────────────────────────────────────────────────── */
-/*
- * [CUSTOMIZE] If the build rejects &arduino_i2c, replace it with &i2c1.
- *   SDA → XIAO P0.06 (SDA / pin D4)
- *   SCL → XIAO P0.07 (SCL / pin D5)
- */
 &i2c1 {
     status = "okay";
-    clock-frequency = <I2C_BITRATE_FAST>;   /* 400 kHz — reduce to
-                                                I2C_BITRATE_STANDARD (100 kHz)
-                                                if you see I²C errors */
 
-    /* ── IO Expander 0: ROWS ─────────────────────────────────────────────── */
-    /*
-     * [CUSTOMIZE #1] Set the address that matches your A2/A1/A0 strapping.
-     *   Update BOTH the @XX label and reg = <0xXX> to the same value.
-     *
-     * [CUSTOMIZE #2] See row-gpios below for pin-to-row assignment.
-     *
-     * No interrupt-gpios property → driver operates without INT signalling.
-     * ZMK's KSCAN polling timer takes over the scan duty cycle.
-     */
     ioex0: pca9555@20 {
         compatible = "nxp,pca9555";
-        reg = <0x20>;           /* [CUSTOMIZE #1] */
+        reg = <0x20>;
         gpio-controller;
         #gpio-cells = <2>;
-        /* interrupt-gpios intentionally omitted — INT pin not routed */
     };
 
-    /* ── IO Expander 1: COLUMNS ──────────────────────────────────────────── */
-    /*
-     * [CUSTOMIZE #1] Set address to match your A2/A1/A0 strapping.
-     */
     ioex1: pca9555@21 {
         compatible = "nxp,pca9555";
-        reg = <0x21>;           /* [CUSTOMIZE #1] */
+        reg = <0x21>;
         gpio-controller;
         #gpio-cells = <2>;
-        /* interrupt-gpios intentionally omitted — INT pin not routed */
     };
 };
 
-/* ── Keyboard matrix ──────────────────────────────────────────────────────── */
 / {
     chosen {
         zmk,kscan = &kscan0;
     };
 
-    kscan0: kscan0 {
+    kscan0: kscan_0 {
         compatible = "zmk,kscan-gpio-matrix";
-        label = "KSCAN";
-
-        /*
-         * [CUSTOMIZE #4]
-         * col2row → diodes point Column → Row:
-         *           columns are driven HIGH; rows are sensed.
-         * row2col → diodes point Row → Column:
-         *           rows are driven HIGH; columns are sensed.
-         * Flip this if every key registers when it shouldn't (inverted logic).
-         */
+        wakeup-source;
         diode-direction = "col2row";
+        poll-period-ms = <5>;
 
-        /*
-         * Polling period.
-         * Required because the PCA9555 INT lines are not connected —
-         * ZMK cannot receive an interrupt when a key changes state, so it
-         * must periodically read the matrix instead.
-         *
-         * 10 ms = 100 scans per second, well below debounce threshold and
-         * fast enough to feel instantaneous to a typist.
-         * You can lower this to 5 ms if you need faster response.
-         */
-        poll-period-ms = <10>;
-
-        /*
-         * ─── COLUMNS ──────────────────────────────────────────────────────
-         * Driven HIGH one at a time during the scan sweep.
-         * [CUSTOMIZE #2] Map each column index to the PCB net → expander pin.
-         * [CUSTOMIZE #3] Add or remove entries to match your column count.
-         *
-         *   Format: <&expander  gpio_number  GPIO_ACTIVE_HIGH>
-         *
-         * This template assumes 14 columns, all on Expander 1.
-         * Adjust expander reference (&ioex0 / &ioex1) and gpio_number to
-         * reflect your actual PCB routing.
-         */
         col-gpios
             = <&ioex1  0 GPIO_ACTIVE_HIGH>  /* Col  0 → EXP1 P00 */
             , <&ioex1  1 GPIO_ACTIVE_HIGH>  /* Col  1 → EXP1 P01 */
@@ -144,21 +44,6 @@
             , <&ioex1 13 GPIO_ACTIVE_HIGH>  /* Col 13 → EXP1 P15 */
             ;
 
-        /*
-         * ─── ROWS ─────────────────────────────────────────────────────────
-         * Read as inputs after each column is driven.
-         * [CUSTOMIZE #2] Map each row index to the PCB net → expander pin.
-         * [CUSTOMIZE #3] Add or remove entries to match your row count.
-         *
-         *   Format: <&expander  gpio_number  (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>
-         *
-         * ⚠  PCA9555D PULL RESISTOR WARNING (see top of file):
-         *    GPIO_PULL_DOWN is expressed here but is NOT configured in
-         *    hardware by the driver.  You need external 10 kΩ pull-down
-         *    resistors on each row sense line on your PCB.
-         *
-         * This template assumes 5 rows, all on Expander 0.
-         */
         row-gpios
             = <&ioex0 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* Row 0 → EXP0 P00 */
             , <&ioex0 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* Row 1 → EXP0 P01 */
