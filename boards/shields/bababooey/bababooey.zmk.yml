@@ -1,8 +1,8 @@
 file_format: "1"
 id: bababooey
-name: Naicha68
+name: Babooey
 type: shield
 url: https://github.com/deltea/naicha68-zmk
-requires: [pro_micro]
+requires: [xiao_ble]
 features:
   - keys
