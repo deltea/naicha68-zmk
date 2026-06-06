@@ -6,22 +6,39 @@
     pinctrl-names = "default", "sleep";
     clock-frequency = <I2C_BITRATE_FAST>;
 
-    ioex0: pca9555@20 {
+    ioex0: pca95xx@20 {
         status = "okay";
-        compatible = "nxp,pca9555";
+        compatible = "nxp,pca95xx";
         reg = <0x20>;
         gpio-controller;
         #gpio-cells = <2>;
         ngpios = <16>;
     };
 
-    ioex1: pca9555@21 {
+    ioex1: pca95xx@21 {
         status = "okay";
-        compatible = "nxp,pca9555";
+        compatible = "nxp,pca95xx";
         reg = <0x21>;
         gpio-controller;
         #gpio-cells = <2>;
         ngpios = <16>;
+    };
+};
+
+&pinctrl {
+    i2c0_default: i2c0_default {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 4)>,
+                <NRF_PSEL(TWIM_SCL, 0, 5)>;
+        };
+    };
+
+    i2c0_sleep: i2c0_sleep {
+        group1 {
+            psels = <NRF_PSEL(TWIM_SDA, 0, 4)>,
+                <NRF_PSEL(TWIM_SCL, 0, 5)>;
+            low-power-enable;
+        };
     };
 };
 
