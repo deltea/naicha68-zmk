@@ -3,6 +3,7 @@ description: NXP PCA9555 I2C GPIO Expander
 compatible: "nxp,pca9555"
 
 include: gpio-controller.yaml
+parent-bus: i2c
 
 properties:
   reg:
@@ -22,4 +23,5 @@ properties:
   ngpios:
     type: int
     default: 32
+    const: 16
     description: Number of GPIO pins on this expander
