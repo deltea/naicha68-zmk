@@ -19,4 +19,4 @@
 #
 ---
 board: [ "xiao_ble" ]
-shield: [ "naked60" ]
+shield: [ "tofu65" ]
