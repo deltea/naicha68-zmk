@@ -4,11 +4,17 @@ manifest:
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
+    - name: pca9555_bindings_base
+      url-base: https://github.com/deltea/pca9555-bindings-base
     # Additional modules containing boards/shields/custom code can be listed here as well
     # See https://docs.zephyrproject.org/3.2.0/develop/west/manifest.html#projects
   projects:
     - name: zmk
       remote: zmkfirmware
       import: app/west.yml
+    - name: pca9555_bindings
+      remote: pca9555_bindings_base
+      revision: main
+      import: west.yml
   self:
     path: config
