@@ -55,10 +55,29 @@
 
         col-gpios
             = <&ioex0 5 GPIO_ACTIVE_HIGH>  /* Col  0 → EXP1 P00 */
+            , <&ioex0 4 GPIO_ACTIVE_HIGH>  /* Col  1 → EXP1 P01 */
+            , <&ioex0 3 GPIO_ACTIVE_HIGH>  /* Col  2 → EXP1 P02 */
+            , <&ioex0 2 GPIO_ACTIVE_HIGH>  /* Col  3 → EXP1 P03 */
+            , <&ioex0 1 GPIO_ACTIVE_HIGH>  /* Col  4 → EXP1 P04 */
+            , <&ioex0 0 GPIO_ACTIVE_HIGH>  /* Col  5 → EXP1 P05 */
+            , <&ioex0 7 GPIO_ACTIVE_HIGH>  /* Col  6 → EXP1 P06 */
+            , <&ioex0 6 GPIO_ACTIVE_HIGH>  /* Col  7 → EXP1 P07 */
+            , <&ioex0 13 GPIO_ACTIVE_HIGH> /* Col  8 → EXP1 P08 */
+            , <&ioex0 12 GPIO_ACTIVE_HIGH> /* Col  9 → EXP1 P09 */
+            , <&ioex0 11 GPIO_ACTIVE_HIGH> /* Col 10 → EXP1 P10 */
+            , <&ioex0 10 GPIO_ACTIVE_HIGH> /* Col 11 → EXP1 P11 */
+            , <&ioex0 9 GPIO_ACTIVE_HIGH>  /* Col 12 → EXP1 P12 */
+            , <&ioex0 8 GPIO_ACTIVE_HIGH>  /* Col 13 → EXP1 P13 */
+            , <&ioex0 15 GPIO_ACTIVE_HIGH> /* Col 14 → EXP1 P14 */
             ;
 
         row-gpios
             = <&ioex0 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* Row 0 → EXP0 P00 */
+            , <&ioex0 1 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* Row 1 → EXP0 P01 */
+            , <&ioex0 2 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* Row 2 → EXP0 P02 */
+            , <&ioex0 3 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* Row 3 → EXP0 P03 */
+            , <&ioex0 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* Row 4 → EXP0 P04 */
+            , <&ioex0 5 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* Row 5 → EXP0 P05 */
             ;
     };
 };
