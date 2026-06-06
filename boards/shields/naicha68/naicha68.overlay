@@ -7,6 +7,7 @@
     clock-frequency = <I2C_BITRATE_FAST>;
 
     ioex0: pca9555@20 {
+        status = "okay";
         compatible = "nxp,pca9555";
         reg = <0x20>;
         gpio-controller;
@@ -15,6 +16,7 @@
     };
 
     ioex1: pca9555@21 {
+        status = "okay";
         compatible = "nxp,pca9555";
         reg = <0x21>;
         gpio-controller;
@@ -52,11 +54,11 @@
         poll-period-ms = <5>;
 
         col-gpios
-            = <&ioex0  5 GPIO_ACTIVE_HIGH>  /* Col  0 → EXP1 P00 */
+            = <&ioex0 5 GPIO_ACTIVE_HIGH>  /* Col  0 → EXP1 P00 */
             ;
 
         row-gpios
-            = <&ioex0  0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* Row 0 → EXP0 P00 */
+            = <&ioex0 0 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>  /* Row 0 → EXP0 P00 */
             ;
     };
 };
