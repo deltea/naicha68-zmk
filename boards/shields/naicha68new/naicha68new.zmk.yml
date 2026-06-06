@@ -1,0 +1,8 @@
+file_format: "1"
+id: naicha68new
+name: Naicha68
+type: shield
+url: https://github.com/deltea/naicha68-zmk
+requires: [pro_micro]
+features:
+  - keys
