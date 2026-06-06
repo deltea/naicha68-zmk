@@ -6,7 +6,7 @@
     pinctrl-names = "default", "sleep";
     clock-frequency = <I2C_BITRATE_FAST>;
 
-    ioex0: pca9555@20 {
+    ioex0: nxp_pca95xx@20 {
         status = "okay";
         compatible = "nxp,pca9555";
         reg = <0x20>;
@@ -15,7 +15,7 @@
         ngpios = <16>;
     };
 
-    ioex1: pca9555@21 {
+    ioex1: nxp_pca95xx@21 {
         status = "okay";
         compatible = "nxp,pca9555";
         reg = <0x21>;
