@@ -7,7 +7,7 @@ on-bus: i2c
 
 properties:
   reg:
-    type: int
+    type: array
     required: true
     description: I2C address of the device (typically 0x20-0x27)
 
@@ -19,6 +19,7 @@ properties:
   "#gpio-cells":
     type: int
     required: true
+    description: Number of items to expect in a GPIO specifier
     const: 2
 
   ngpios:
