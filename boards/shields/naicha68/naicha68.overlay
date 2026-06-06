@@ -9,17 +9,11 @@
     ioex0: pca9555@20 {
         compatible = "nxp,pca9555";
         reg = <0x20>;
-        gpio-controller;
-        #gpio-cells = <2>;
-        ngpios = <16>;
     };
 
     ioex1: pca9555@21 {
         compatible = "nxp,pca9555";
         reg = <0x21>;
-        gpio-controller;
-        #gpio-cells = <2>;
-        ngpios = <16>;
     };
 };
 
