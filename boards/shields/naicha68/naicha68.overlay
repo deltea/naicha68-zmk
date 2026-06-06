@@ -12,7 +12,7 @@
         reg = <0x20>;
         gpio-controller;
         #gpio-cells = <2>;
-        ngpios = <16>;
+        ngpios = <32>;
     };
 
     ioex1: pca9555@21 {
@@ -21,7 +21,7 @@
         reg = <0x21>;
         gpio-controller;
         #gpio-cells = <2>;
-        ngpios = <16>;
+        ngpios = <32>;
     };
 };
 
@@ -48,7 +48,7 @@
     };
 
     kscan0: kscan_0 {
-        compatible = "zmk,kscan-gpio-matrix";
+        compatible = "zmk,kscan-matrix";
         wakeup-source;
         diode-direction = "col2row";
         poll-period-ms = <5>;
