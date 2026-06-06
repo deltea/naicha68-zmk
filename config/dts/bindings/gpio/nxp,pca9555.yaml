@@ -19,5 +19,5 @@ properties:
 
   ngpios:
     type: int
-    default: 16
+    default: 32
     description: Number of GPIO pins on this expander
