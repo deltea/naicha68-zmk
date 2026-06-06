@@ -10,8 +10,8 @@
         status = "okay";
         compatible = "nxp,pca9555";
         reg = <0x20>;
-        gpio-controller;
         #gpio-cells = <2>;
+        gpio-controller;
         ngpios = <32>;
     };
 
@@ -19,8 +19,8 @@
         status = "okay";
         compatible = "nxp,pca9555";
         reg = <0x21>;
-        gpio-controller;
         #gpio-cells = <2>;
+        gpio-controller;
         ngpios = <32>;
     };
 };
