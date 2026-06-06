@@ -11,7 +11,7 @@
         reg = <0x20>;
         gpio-controller;
         #gpio-cells = <2>;
-        ngpios = <16>;
+        ngpios = <32>;
     };
 
     ioex1: pca9555@21 {
@@ -19,7 +19,7 @@
         reg = <0x21>;
         gpio-controller;
         #gpio-cells = <2>;
-        ngpios = <16>;
+        ngpios = <32>;
     };
 };
 
