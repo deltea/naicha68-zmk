@@ -9,7 +9,7 @@ properties:
     required: true
     description: I2C address of the device (typically 0x20-0x27)
 
-  gpio-controller: true
+  gpio-controller: {'type': 'boolean', 'required': True, 'description': "Convey's this node is a GPIO controller"}
 
   "#gpio-cells":
     const: 2
