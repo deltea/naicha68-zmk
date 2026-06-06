@@ -1,4 +1,4 @@
-if SHIELD_NAICHA68
+if SHIELD_BABABOOEY
 
 config ZMK_KEYBOARD_NAME
     default "Naicha68"
