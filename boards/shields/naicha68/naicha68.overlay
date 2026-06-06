@@ -1,4 +1,4 @@
-&i2c1 {
+&i2c0 {
     status = "okay";
     compatible = "nordic,nrf-twim";
     pinctrl-0 = <&i2c0_default>;
@@ -7,21 +7,19 @@
     clock-frequency = <I2C_BITRATE_FAST>;
 
     ioex0: pca9555@20 {
-        status = "okay";
         compatible = "nxp,pca9555";
         reg = <0x20>;
         gpio-controller;
         #gpio-cells = <2>;
-        ngpios = <32>;
+        ngpios = <16>;
     };
 
     ioex1: pca9555@21 {
-        status = "okay";
         compatible = "nxp,pca9555";
         reg = <0x21>;
         gpio-controller;
         #gpio-cells = <2>;
-        ngpios = <32>;
+        ngpios = <16>;
     };
 };
 
