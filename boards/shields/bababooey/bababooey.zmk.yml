@@ -3,6 +3,6 @@ id: bababooey
 name: Babooey
 type: shield
 url: https://github.com/deltea/naicha68-zmk
-requires: [xiao_ble]
+requires: [seeeduino_xiao_ble]
 features:
   - keys
