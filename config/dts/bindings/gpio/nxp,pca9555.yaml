@@ -17,6 +17,7 @@ properties:
     description: Convey's this node is a GPIO controller
 
   "#gpio-cells":
+    type: int
     required: true
     const: 2
 
