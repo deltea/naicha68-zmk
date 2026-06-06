@@ -20,5 +20,5 @@
 ---
 
 include:
-  - board: xiao_ble
-    shield: naicha68
+  - board: nice_nano
+    shield: naked60
