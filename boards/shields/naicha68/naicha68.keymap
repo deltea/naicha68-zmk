@@ -18,11 +18,11 @@
 
 
             bindings = <
-                &kp ESC    &kp N1 &kp N2    &kp N3   &kp N4   &kp N5                    &kp N6 &kp N7   &kp N8    &kp N9  &kp N0    &kp BSPC
-                &kp TAB    &kp Q  &kp W     &kp E    &kp R    &kp T                     &kp Y  &kp U    &kp I     &kp O   &kp P     &kp BSLH
-                &kp LSHFT  &kp A  &kp S     &kp D    &kp F    &kp G                     &kp H  &kp J    &kp K     &kp L   &kp SEMI  &kp SQT
-                &kp LCTRL  &kp Z  &kp X     &kp C    &kp V    &kp B                     &kp N  &kp M    &kp COMMA &kp DOT &kp FSLH  &kp RET
-                           &mo 3  &kp LCTRL &kp LALT &kp LGUI &mo 1 &kp SPACE &kp SPACE &mo 2  &kp LEFT &kp DOWN  &kp UP  &kp RIGHT
+                &bp ESC    &bp N1 &bp N2    &bp N3   &bp N4   &bp N5                    &bp N6 &bp N7   &bp N8    &bp N9  &bp N0    &bp BSPC
+                &bp TAB    &bp Q  &bp W     &bp E    &bp R    &bp T                     &bp Y  &bp U    &bp I     &bp O   &bp P     &bp BSLH
+                &bp LSHFT  &bp A  &bp S     &bp D    &bp F    &bp G                     &bp H  &bp J    &bp K     &bp L   &bp SEMI  &bp SQT
+                &bp LCTRL  &bp Z  &bp X     &bp C    &bp V    &bp B                     &bp N  &bp M    &bp COMMA &bp DOT &bp FSLH  &bp RET
+                           &mo 3  &bp LCTRL &bp LALT &bp LGUI &mo 1 &bp SPACE &bp SPACE &mo 2  &bp LEFT &bp DOWN  &bp UP  &bp RIGHT
             >;
         };
     };
