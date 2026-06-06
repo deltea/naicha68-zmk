@@ -15,6 +15,6 @@ manifest:
     - name: pca9555-bindings-module
       remote: pca9555_bindings_base
       revision: main
-      import: west.yml
+      import: config/west.yml
   self:
     path: config
