@@ -6,6 +6,7 @@ include: gpio-controller.yaml
 
 properties:
   reg:
+    type: int
     required: true
     description: I2C address of the device (typically 0x20-0x27)
 
