@@ -19,4 +19,4 @@
 #
 ---
 board: [ "xiao_ble" ]
-shield: [ "naicha68" ]
+shield: [ "naked60" ]
